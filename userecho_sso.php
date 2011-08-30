@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: UserEcho SSO Plugin
-Version: 0.2
+Version: 0.3
 Plugin URI: https://github.com/jrchamp/userecho_sso
 Author: Jonathan Champ
 Author URI: https://github.com/jrchamp
@@ -15,7 +15,10 @@ define( 'UE_SSO_URL', plugins_url() . '/userecho_sso' );
 
 class UserEcho_SSO {
 	public function __construct() {
+		load_plugin_textdomain('UserEchoSSO', false, basename( dirname( __FILE__ ) ) . '/lang' );
+
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
+		add_action( 'template_redirect', array( $this, 'sso_login' ), 1 );
 	}
 
 	public function add_menu() {
@@ -51,10 +54,10 @@ class UserEcho_SSO {
 		}
 
 		$locale_options = array(
-			'nl' => __('Dutch'),
-			'en' => __('English'),
-			'de' => __('German'),
-			'ru' => __('Russian'),
+			'nl' => __( 'Dutch' ),
+			'en' => __( 'English' ),
+			'de' => __( 'German' ),
+			'ru' => __( 'Russian' ),
 		);
 		if ( !empty( $options['locale'] ) ) {
 			$locale_options += array( $options['locale'] => 'Custom (' + $options['locale'] + ')' );
@@ -62,7 +65,7 @@ class UserEcho_SSO {
 		?>
 
 		<div id="icon-options-general" class="icon32"><br /></div>
-		<h2>UserEcho SSO: <?php _e('Options'); ?></h2>
+		<h2>UserEcho SSO: <?php _e( 'Options' ); ?></h2>
 
 		<form method="post" action="">
 			<?php wp_nonce_field( 'userecho_sso' ); ?>
@@ -200,8 +203,16 @@ class UserEcho_SSO {
 	}
 
 	public function sso_login() {
+		if ( empty( $_GET['userecho_sso_login'] ) ) {
+			return;
+		}
+
 		global $current_user;
 		$options = $this->get_options();
+
+		if ( empty( $options['api_key'] ) ) {
+			return;
+		}
 
 		$params = array(
 			'guid' => $current_user->user_login, // User ID in your system - used to identify user (first time auto-registration)
