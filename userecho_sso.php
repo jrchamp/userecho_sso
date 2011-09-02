@@ -1,13 +1,12 @@
 <?php
 /*
 Plugin Name: UserEcho SSO Plugin
-Version: 0.3
+Version: 0.4
 Plugin URI: https://github.com/jrchamp/userecho_sso
 Author: Jonathan Champ
 Author URI: https://github.com/jrchamp
 Description: Allows users to automatically sign in to the associated UserEcho account.
 TODO:
- * Feedback link
  * Widget for feedback link?
 */
 
@@ -38,9 +37,8 @@ class UserEcho_SSO {
 			delete_option( 'UserEcho_SSO_options' );
 		}
 
-		$options = $this->get_options();
-
 		if ( $action === 'edit' && check_admin_referer( 'userecho_sso' ) ) {
+			$options = $this->get_options();
 			$orig_options = $options;
 
 			if ( !empty( $_POST['api_key'] ) ) { $options['api_key'] = $_POST['api_key']; }
@@ -53,6 +51,59 @@ class UserEcho_SSO {
 			}
 		}
 
+		$screen_layout_columns = 2;
+		$screen = get_current_screen();
+
+		add_meta_box( 'userecho_sso_configuration', __( 'Configuration', 'UserEchoSSO' ), array( $this, 'meta_configuration_content' ), $screen->id, 'normal', 'core' );
+		add_meta_box( 'userecho_sso_reset_configuration', __( 'Reset Configuration', 'UserEchoSSO' ), array( $this, 'meta_reset_configuration_content' ), $screen->id, 'side', 'core' );
+
+		$title = 'UserEcho SSO: ' . __( 'Options' );
+?>
+		<div class="wrap">
+			<?php screen_icon('options-general'); ?>
+			<h2><?php echo esc_html( $title ); ?></h2>
+			<div id="dashboard-widgets-wrap">
+<?php
+		$column_visibility = array(
+			'normal' => '',
+			'side' => '',
+			'column3' => '',
+			'column4' => '',
+		);
+		switch ( $screen_layout_columns ) {
+			case 4:
+				$width = 'width:24.5%;';
+				break;
+			case 3:
+				$width = 'width:32.67%;';
+				$column_visibility['column4'] = 'display:none;';
+				break;
+			case 2:
+				$width = 'width:49%;';
+				$column_visibility['column3'] = $column_visibility['column4'] = 'display:none;';
+				break;
+			default:
+				$width = 'width:98%;';
+				$column_visibility['side'] = $column_visibility['column3'] = $column_visibility['column4'] = 'display:none;';
+		}
+?>
+				<div id="dashboard-widgets" class="metabox-holder">
+<?php
+		foreach ( $column_visibility as $column => $visibility ) {
+			echo "\t\t\t\t<div class='postbox-container' style='{$visibility}$width'>\n";
+			do_meta_boxes( $screen->id, $column, '' );
+			echo "\t\t\t\t</div>\n";
+		}
+?>
+				</div>
+				<div class="clear"></div>
+			</div><!-- dashboard-widgets-wrap -->
+		</div><!-- wrap -->
+<?php
+	}
+
+	function meta_configuration_content() {
+		$options = $this->get_options();
 		$locale_options = array(
 			'nl' => __( 'Dutch' ),
 			'en' => __( 'English' ),
@@ -62,79 +113,65 @@ class UserEcho_SSO {
 		if ( !empty( $options['locale'] ) ) {
 			$locale_options += array( $options['locale'] => 'Custom (' + $options['locale'] + ')' );
 		}
-		?>
 
-		<div id="icon-options-general" class="icon32"><br /></div>
-		<h2>UserEcho SSO: <?php _e( 'Options' ); ?></h2>
-
+?>
 		<form method="post" action="">
 			<?php wp_nonce_field( 'userecho_sso' ); ?>
 			<input type="hidden" name="ue_action" value="edit" />
-			<div class='clear metabox-holder'>
-			<div class='postbox-container' style='width:49%;'>
-			<div id='normal-sortables' class='meta-box-sortables ui-sortable'>
-				<div class="postbox">
-					<h3><?php _e( 'Configuration', 'UserEchoSSO' ); ?></h3>
-					<div class="inside">
-						<p class="sub"><?php _e( 'Set the options for your UserEcho account to allow for Single Sign On capabilities.', 'UserEchoSSO' ); ?></p>
-						<div class="table">
-						<table class="form-table">
-						<tbody>
-							<tr valign="top">
-								<td width="100">
-									<label for="api_key"><?php _e( 'API Key', 'UserEchoSSO' ); ?></label>
-								</td>
-								<td>
-									<input id="api_key" name="api_key" type="text" size="50" value="<?php echo esc_attr( $options['api_key'] ); ?>" />
-								</td>
-							</tr>
-							<tr valign="top">
-								<td>
-									<label for="project_key"><?php _e( 'Project Key', 'UserEchoSSO' ); ?></label>
-								</td>
-								<td>
-									<input id="project_key" name="project_key" type="text" size="50" value="<?php echo esc_attr( $options['project_key'] ); ?>" />
-								</td>
-							</tr>
-							<tr valign="top">
-								<td>
-									<label for="domain"><?php _e( 'Domain', 'UserEchoSSO' ); ?></label>
-								</td>
-								<td>
-									<input id="domain" name="domain" type="text" size="50" value="<?php echo esc_attr( $options['domain'] ); ?>" />
-								</td>
-							</tr>
-							<tr valign="top">
-								<td>
-									<label for="locale"><?php _e( 'Locale', 'UserEchoSSO' ); ?></label>
-								</td>
-								<td>
-									<select id="locale" name="locale">
-									<?php foreach ( $locale_options as $locale => $label ) {
-										echo '<option value="' . esc_attr( $locale ) . '"' . selected( $locale, $options['locale'], false ) . '>' . esc_attr( $label ) . '</option>';
-									} ?>
-									</select>
-								</td>
-							</tr>
-						</tbody>
-						</table>
-						</div>
-						<p class="submit"><input type="submit" class="button-primary" value="Save Options" /></p>
-						<div class="clear"></div>
-					</div>
-				</div>
-				<div class="postbox">
-					<h3><?php _e( 'Reset Configuration', 'UserEchoSSO' ); ?></h3>
-					<div class="inside">
-						<p class="sub"><?php _e( 'Deletes the UserEcho SSO configuration details.', 'UserEchoSSO' ); ?></p>
-						<p><a onclick="return confirm('<?php _e( 'Are you sure you want to reset all data?'); ?>')" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=userecho_sso&ue_action=delete' ), 'ue-delete-options' ); ?>" ><?php _e( 'Delete UserEcho SSO configuration.'); ?></a></p>
-					</div>
-				</div>
-			</div>
-			</div>
+			<p class="sub"><?php _e( 'Set the options for your UserEcho account to allow for Single Sign On capabilities.', 'UserEchoSSO' ); ?></p>
+			<div class="table">
+				<table class="form-table">
+					<tbody>
+						<tr valign="top">
+							<td width="100">
+								<label for="api_key"><?php _e( 'API Key', 'UserEchoSSO' ); ?></label>
+							</td>
+							<td>
+								<input id="api_key" name="api_key" type="text" size="50" value="<?php echo esc_attr( $options['api_key'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<td>
+								<label for="project_key"><?php _e( 'Project Key', 'UserEchoSSO' ); ?></label>
+							</td>
+							<td>
+								<input id="project_key" name="project_key" type="text" size="50" value="<?php echo esc_attr( $options['project_key'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<td>
+								<label for="domain"><?php _e( 'Domain', 'UserEchoSSO' ); ?></label>
+							</td>
+							<td>
+								<input id="domain" name="domain" type="text" size="50" value="<?php echo esc_attr( $options['domain'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<td>
+								<label for="locale"><?php _e( 'Locale', 'UserEchoSSO' ); ?></label>
+							</td>
+							<td>
+								<select id="locale" name="locale">
+								<?php foreach ( $locale_options as $locale => $label ) {
+									echo '<option value="' . esc_attr( $locale ) . '"' . selected( $locale, $options['locale'], false ) . '>' . esc_attr( $label ) . '</option>';
+								} ?>
+								</select>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<p class="submit"><input type="submit" class="button-primary" value="Save Options" /></p>
+				<div class="clear"></div>
 			</div>
 		</form>
-		<?php
+<?php
+	}
+
+	function meta_reset_configuration_content() {
+?>
+		<p class="sub"><?php _e( 'Deletes the UserEcho SSO configuration details.', 'UserEchoSSO' ); ?></p>
+		<p><a onclick="return confirm('<?php _e( 'Are you sure you want to reset all data?'); ?>')" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=userecho_sso&ue_action=delete' ), 'ue-delete-options' ); ?>" ><?php _e( 'Delete UserEcho SSO configuration.'); ?></a></p>
+<?php
 	}
 
 	// This function returns the current options
