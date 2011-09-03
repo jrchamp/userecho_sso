@@ -1,20 +1,18 @@
 <?php
 /*
 Plugin Name: UserEcho SSO Plugin
-Version: 0.4
+Version: 0.6
 Plugin URI: https://github.com/jrchamp/userecho_sso
 Author: Jonathan Champ
 Author URI: https://github.com/jrchamp
 Description: Allows users to automatically sign in to the associated UserEcho account.
-TODO:
- * Widget for feedback link?
 */
 
 define( 'UE_SSO_URL', plugins_url() . '/userecho_sso' );
 
 class UserEcho_SSO {
 	public function __construct() {
-		load_plugin_textdomain('UserEchoSSO', false, basename( dirname( __FILE__ ) ) . '/lang' );
+		load_plugin_textdomain( 'UserEchoSSO', false, basename( dirname( __FILE__ ) ) . '/lang' );
 
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
 		add_action( 'template_redirect', array( $this, 'sso_login' ), 1 );
@@ -60,7 +58,7 @@ class UserEcho_SSO {
 		$title = 'UserEcho SSO: ' . __( 'Options' );
 ?>
 		<div class="wrap">
-			<?php screen_icon('options-general'); ?>
+			<?php screen_icon( 'options-general' ); ?>
 			<h2><?php echo esc_html( $title ); ?></h2>
 			<div id="dashboard-widgets-wrap">
 <?php
@@ -170,7 +168,7 @@ class UserEcho_SSO {
 	function meta_reset_configuration_content() {
 ?>
 		<p class="sub"><?php _e( 'Deletes the UserEcho SSO configuration details.', 'UserEchoSSO' ); ?></p>
-		<p><a onclick="return confirm('<?php _e( 'Are you sure you want to reset all data?'); ?>')" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=userecho_sso&ue_action=delete' ), 'ue-delete-options' ); ?>" ><?php _e( 'Delete UserEcho SSO configuration.'); ?></a></p>
+		<p><a onclick="return confirm('<?php _e( 'Are you sure you want to reset all data?' ); ?>')" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=userecho_sso&ue_action=delete' ), 'ue-delete-options' ); ?>" ><?php _e( 'Delete UserEcho SSO configuration.' ); ?></a></p>
 <?php
 	}
 
@@ -240,6 +238,7 @@ class UserEcho_SSO {
 	}
 
 	public function sso_login() {
+		// Perform login on ?userecho_sso_login=1
 		if ( empty( $_GET['userecho_sso_login'] ) ) {
 			return;
 		}
@@ -266,6 +265,63 @@ class UserEcho_SSO {
 		$redirect = $base_url . '?sso_token=' . $this->get_sso_token( $params );
 		header( 'Location: ' . $redirect );
 		die();
+	}
+}
+
+add_action( 'widgets_init', 'userecho_sso_widgets' );
+
+function userecho_sso_widgets() {
+	register_widget( 'UserEcho_SSO_Widget' );
+}
+
+class UserEcho_SSO_Widget extends WP_Widget {
+	public function __construct() {
+		$widget_ops = array( 'classname' => 'userecho_sso_widget', 'description' => __( 'Adds a customizable SSO login widget to your site' ) );
+		parent::WP_Widget( 'userecho_sso_widget', __( 'UserEcho SSO Login', 'UserEchoSSO' ), $widget_ops );
+	}
+
+	public function form( $instance ) {
+		// outputs the options form on admin
+		if ( $instance ) {
+			$title = esc_attr( $instance['title'] );
+			$link_text = esc_attr( $instance['link_text'] );
+		}
+		else {
+			$title = __( 'UserEcho Login', 'UserEcho_SSO_Widget' );
+			$link_text = __( 'Go to UserEcho', 'UserEcho_SSO_Widget' );
+		}
+		?>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
+		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" />
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'link_text' ); ?>"><?php _e( 'Content:' ); ?></label>
+		<input class="widefat" id="<?php echo $this->get_field_id( 'link_text' ); ?>" name="<?php echo $this->get_field_name( 'link_text' ); ?>" type="text" value="<?php echo $link_text; ?>" />
+		</p>
+		<?php
+	}
+
+	public function update( $new_instance, $old_instance ) {
+		// processes widget options to be saved
+		$instance = $old_instance;
+		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['link_text'] = strip_tags( $new_instance['link_text'], '<i><b><em><strong><span><img><br>' );
+		return $instance;
+	}
+
+	public function widget( $args, $instance ) {
+		// outputs the content of the widget
+		extract( $args );
+		$title = apply_filters( 'widget_title', $instance['title'] );
+		echo $before_widget;
+		if ( $title ) {
+			echo $before_title . $title . $after_title;
+		}
+		?>
+		<a href="?userecho_sso_login=1"><?php echo $instance['link_text']; ?></a>
+		<?php
+		echo $after_widget;
 	}
 }
 
