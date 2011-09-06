@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: UserEcho SSO Plugin
-Version: 0.6
+Version: 0.7
 Plugin URI: https://github.com/jrchamp/userecho_sso
 Author: Jonathan Champ
 Author URI: https://github.com/jrchamp
@@ -311,6 +311,12 @@ class UserEcho_SSO_Widget extends WP_Widget {
 	}
 
 	public function widget( $args, $instance ) {
+		// hide widget for unauthenticated users
+		global $current_user;
+		if ( empty( $current_user->user_login ) ) {
+			return;
+		}
+
 		// outputs the content of the widget
 		extract( $args );
 		$title = apply_filters( 'widget_title', $instance['title'] );
