@@ -267,16 +267,22 @@ class UserEcho_SSO {
 		// Perform login on ?userecho_sso_login=1
 		if ( empty( $_GET['userecho_sso_login'] ) ) {
 			return;
+
 		}
 
 		global $current_user;
 		$options = $this->get_options();
 
+		$base_url = 'http://' . $options['domain'] . '/';
+
 		if ( empty( $options['api_key'] ) ) {
+			//if api_key not provided just go to the userecho forum without authorization, like simple link was clciked
+			header( 'Location: ' . $base_url );
+			die();
 			return;
 		}
 
-		$base_url = 'http://' . $options['domain'] . '/';
+		
 		if ( isset( $_GET['return'] ) && strpos( $_GET['return'], $base_url ) === 0 ) {
 			$base_url = $_GET['return'];
 		}
