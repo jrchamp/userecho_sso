@@ -342,6 +342,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 			$tab_corner_radius = esc_attr( $instance['tab_corner_radius'] );
 			$tab_font_size = esc_attr( $instance['tab_font_size'] );
 			$tab_alignment = esc_attr( $instance['tab_alignment'] );
+			$tab_text = esc_attr( $instance['tab_text'] );
 			$tab_text_color = esc_attr( $instance['tab_text_color'] );
 			$tab_bg_color = esc_attr( $instance['tab_bg_color'] );
 			$tab_hover_color = esc_attr( $instance['tab_hover_color'] );
@@ -357,6 +358,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 			$tab_corner_radius = 10;
 			$tab_font_size = 20;
 			$tab_alignment = 'right';
+			$tab_text = 'Feedback';
 			$tab_text_color = '#ffffff';
 			$tab_bg_color = '#ee105a';
 			$tab_hover_color = '#f45c5c';
@@ -396,6 +398,10 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		<p>
 		<label for="<?php echo $this->get_field_id( 'tab_font_size' ); ?>"><?php _e( 'Font Size:', 'UserEchoSSO' ); ?></label>
 		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_font_size' ); ?>" name="<?php echo $this->get_field_name( 'tab_font_size' ); ?>" type="text" value="<?php echo $tab_font_size; ?>" />
+		</p>		
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_text' ); ?>"><?php _e( 'Text on tab:', 'UserEchoSSO' ); ?></label>
+		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_text' ); ?>" name="<?php echo $this->get_field_name( 'tab_text' ); ?>" type="text" value="<?php echo $tab_text; ?>" />
 		</p>
 		<p>
 		<label for="<?php echo $this->get_field_id( 'tab_text_color' ); ?>"><?php _e( 'Text Color:', 'UserEchoSSO' ); ?></label>
@@ -428,6 +434,12 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_corner_radius' ); ?>" name="<?php echo $this->get_field_name( 'tab_corner_radius' ); ?>" type="text" value="<?php echo $tab_corner_radius; ?>" />
 		</p>
 		<?php
+	}
+
+	private function get_tab_text_hash($text) {
+		//creates hash for custom text on widget
+		$revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+    	return strtr(rawurlencode(base64_encode($text)), $revert);
 	}
 
 	private function get_text_color( $background_color ) {
@@ -463,6 +475,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		$instance['tab_corner_radius'] = strip_tags( $new_instance['tab_corner_radius'] );
 		$instance['tab_font_size'] = strip_tags( $new_instance['tab_font_size'] );
 		$instance['tab_alignment'] = strip_tags( $new_instance['tab_alignment'] );
+		$instance['tab_text'] = strip_tags( $new_instance['tab_text'] );
 		$instance['tab_text_color'] = strip_tags( $new_instance['tab_text_color'] );
 		$instance['tab_bg_color'] = strip_tags( $new_instance['tab_bg_color'] );
 		$instance['tab_hover_color'] = strip_tags( $new_instance['tab_hover_color'] );
@@ -488,6 +501,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 				'tab_icon_show' => (bool) $instance['tab_icon_show'],
 				'tab_corner_radius' => (int) $instance['tab_corner_radius'],
 				'tab_font_size' => (int) $instance['tab_font_size'],
+				'tab_image_hash' => $this->get_tab_text_hash($instance['tab_text']),
 				'tab_alignment' => $instance['tab_alignment'],
 				'tab_text_color' => $instance['tab_text_color'],
 				'tab_bg_color' => $instance['tab_bg_color'],
