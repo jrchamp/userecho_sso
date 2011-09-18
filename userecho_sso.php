@@ -354,7 +354,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 			$show_login = 1;
 			$show_tab = 1;
 			$language = $options['locale'];
-			$forum = '';
+			$forum = '1';
 			$tab_corner_radius = 10;
 			$tab_font_size = 20;
 			$tab_alignment = 'right';
