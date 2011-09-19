@@ -267,29 +267,18 @@ class UserEcho_SSO {
 		// Perform login on ?userecho_sso_login=1
 		if ( empty( $_GET['userecho_sso_login'] ) ) {
 			return;
-
 		}
 
 		global $current_user;
 		$options = $this->get_options();
 
-		$base_url = 'http://' . $options['domain'] . '/';
-
-		if ( empty( $options['api_key'] ) ) {
-			//if api_key not provided just go to the userecho forum without authorization, like simple link was clciked
-			header( 'Location: ' . $base_url );
-			die();
-			return;
+		$redirect_url = 'http://' . $options['domain'] . '/';
+		if ( isset( $_GET['return'] ) && strpos( $_GET['return'], $redirect_url ) === 0 ) {
+			$redirect_url = $_GET['return'];
 		}
 
-		
-		if ( isset( $_GET['return'] ) && strpos( $_GET['return'], $base_url ) === 0 ) {
-			$base_url = $_GET['return'];
-		}
-
-		$redirect = $base_url;
-
-		if ( !empty( $current_user->user_login ) ) {
+		// if api_key not provided just go to the userecho forum without authorization, like simple link was clicked
+		if ( !empty( $options['api_key'] ) && !empty( $current_user->user_login ) ) {
 			$params = array(
 				'guid' => $current_user->user_login, // User ID in your system - used to identify user (first time auto-registration)
 				'display_name' => $current_user->display_name, // User display name in your system
@@ -297,10 +286,10 @@ class UserEcho_SSO {
 				'locale' => $options['locale'], // (Optional) User language override
 			);
 
-			$redirect .= '?sso_token=' . $this->get_sso_token( $params );
+			$redirect_url .= '?sso_token=' . $this->get_sso_token( $params );
 		}
 
-		header( 'Location: ' . $redirect );
+		header( 'Location: ' . $redirect_url );
 		die();
 	}
 }
@@ -392,7 +381,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		<select id="<?php echo $this->get_field_id( 'language' ); ?>" name="<?php echo $this->get_field_name( 'language' ); ?>">
 			<?php
 			foreach ( $language_options as $language_option => $language_label ) {
-				echo '<option value="' . esc_attr( $language_option ) . '"' .  selected( $language_option, $language, FALSE ) . '>' . esc_attr( $language_label ) . '</option>';
+				echo '<option value="' . esc_attr( $language_option ) . '"' . selected( $language_option, $language, FALSE ) . '>' . esc_attr( $language_label ) . '</option>';
 			}
 			?>
 		</select>
@@ -404,7 +393,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		<p>
 		<label for="<?php echo $this->get_field_id( 'tab_font_size' ); ?>"><?php _e( 'Font Size:', 'UserEchoSSO' ); ?></label>
 		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_font_size' ); ?>" name="<?php echo $this->get_field_name( 'tab_font_size' ); ?>" type="text" value="<?php echo $tab_font_size; ?>" />
-		</p>		
+		</p>
 		<p>
 		<label for="<?php echo $this->get_field_id( 'tab_text' ); ?>"><?php _e( 'Text on tab:', 'UserEchoSSO' ); ?></label>
 		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_text' ); ?>" name="<?php echo $this->get_field_name( 'tab_text' ); ?>" type="text" value="<?php echo $tab_text; ?>" />
@@ -426,7 +415,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		<select id="<?php echo $this->get_field_id( 'tab_alignment' ); ?>" name="<?php echo $this->get_field_name( 'tab_alignment' ); ?>">
 			<?php
 			foreach ( $tab_alignment_options as $tab_alignment_option => $tab_alignment_label ) {
-				echo '<option value="' . esc_attr( $tab_alignment_option ) . '"' .  selected( $tab_alignment_option, $tab_alignment, FALSE ) . '>' . esc_attr( $tab_alignment_label ) . '</option>';
+				echo '<option value="' . esc_attr( $tab_alignment_option ) . '"' . selected( $tab_alignment_option, $tab_alignment, FALSE ) . '>' . esc_attr( $tab_alignment_label ) . '</option>';
 			}
 			?>
 		</select>
@@ -442,10 +431,16 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		<?php
 	}
 
-	private function get_tab_text_hash($text) {
+	private function get_tab_text_hash( $text ) {
 		//creates hash for custom text on widget
-		$revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-    	return strtr(rawurlencode(base64_encode($text)), $revert);
+		$revert = array(
+			'%21' => '!',
+			'%2A' => '*',
+			'%27' => "'",
+			'%28' => '(',
+			'%29' => ')',
+		);
+		return strtr( rawurlencode( base64_encode( $text ) ), $revert );
 	}
 
 	private function get_text_color( $background_color ) {
