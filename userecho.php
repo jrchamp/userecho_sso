@@ -24,21 +24,21 @@ License: GPLv2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-define( 'UE_SSO_URL', plugins_url() . '/userecho' );
+define( 'UE_URL', plugins_url() . '/userecho' );
 
-class UserEcho_SSO {
+class UserEcho {
 	public function __construct() {
-		load_plugin_textdomain( 'UserEchoSSO', false, basename( dirname( __FILE__ ) ) . '/lang' );
+		load_plugin_textdomain( 'UserEcho', false, basename( dirname( __FILE__ ) ) . '/lang' );
 
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
-		add_action( 'template_redirect', array( $this, 'sso_login' ), 1 );
+		add_action( 'template_redirect', array( $this, 'login' ), 1 );
 		add_action( 'wp_footer', array( $this, 'show_tab_widget' ) );
 
 	}
 
 	public function add_menu() {
 		$options = $this->get_options();
-		add_menu_page( 'UserEcho SSO ' . __( 'Options' ), 'UserEcho SSO', 'manage_options', 'userecho_sso', array( $this, 'set_options' ), UE_SSO_URL . '/icon.png' );
+		add_menu_page( 'UserEcho' . __( 'Options' ), 'UserEcho Wordpress Integration', 'manage_options', 'userecho', array( $this, 'set_options' ), UE_URL . '/icon.png' );
 	}
 
 	public function set_options() {
@@ -50,10 +50,10 @@ class UserEcho_SSO {
 		$action = $_REQUEST['ue_action'];
 
 		if ( $action === 'delete' && check_admin_referer( 'ue-delete-options' ) ) {
-			delete_option( 'UserEcho_SSO_options' );
+			delete_option( 'UserEcho_options' );
 		}
 
-		if ( $action === 'edit' && check_admin_referer( 'userecho_sso' ) ) {
+		if ( $action === 'edit' && check_admin_referer( 'userecho' ) ) {
 			$options = $this->get_options();
 			$orig_options = $options;
 
@@ -74,7 +74,7 @@ class UserEcho_SSO {
 			if ( !empty( $_POST['tab_hover_color'] ) ) { $options['tab_hover_color'] = $_POST['tab_hover_color']; }			
 
 			if ( $orig_options !== $options ) {
-				update_option( 'UserEcho_SSO_options', $options );
+				update_option( 'UserEcho_options', $options );
 			}
 		}
 
@@ -113,32 +113,33 @@ class UserEcho_SSO {
 <h3>Tab widget:</h3>
 
 		<form method="post" action="">
-			<?php wp_nonce_field( 'userecho_sso' ); ?>
+			<?php wp_nonce_field( 'userecho' ); ?>
 			<input type="hidden" name="ue_action" value="edit" />
-			<p class="sub"><?php _e( 'Customize visual style of tab widget', 'UserEchoSSO' ); ?></p>
 			<div class="table">
 				<table class="form-table">
 					<tbody>
 						<tr valign="top">
-							<th><?php _e( 'Show UserEcho tab widget', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Show UserEcho tab widget', 'UserEcho' ); ?></th>
 							<td>
 								<input id="show_tab" name="show_tab" type="checkbox" value="1"<?php checked( $options['show_tab'], '1' ); ?> />
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Domain', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Domain', 'UserEcho' ); ?></th>
 							<td>
 								<input id="domain" name="domain" type="text" class="regular-text" value="<?php echo esc_attr( $options['domain'] ); ?>" />
+								<span class="description"><?php _e( 'Your UserEcho community url.', 'UserEcho' ); ?></span>
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Forum id', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Forum id', 'UserEcho' ); ?></th>
 							<td>
 								<input id="forum" name="forum" type="text" class="regular-text" value="<?php echo esc_attr( $options['forum'] ); ?>" />
+								<span class="description"><?php _e( 'Move mouse over forum name at the your UserEcho community right panel. And find out forum id in the browser status bar.', 'UserEcho' ); ?></span>
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Language', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Language', 'UserEcho' ); ?></th>
 							<td>
 								<select id="language" name="language">
 								<?php foreach ( $language_options as $locale => $label ) {
@@ -156,37 +157,37 @@ class UserEcho_SSO {
 						
 						
 						<tr valign="top">
-							<th><?php _e( 'Font size', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Font size', 'UserEcho' ); ?></th>
 							<td>
 								<input id="tab_font_size" name="tab_font_size" type="text" class="regular-text" value="<?php echo esc_attr( $options['tab_font_size'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Text on tab', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Text on tab', 'UserEcho' ); ?></th>
 							<td>
 								<input id="tab_text" name="tab_text" type="text" class="regular-text" value="<?php echo esc_attr( $options['tab_text'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Text color', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Text color', 'UserEcho' ); ?></th>
 							<td>
 								<input id="tab_text_color" name="tab_text_color" type="text" class="regular-text" style="background-color: <?php echo $options['tab_text_color']; ?>; color: <?php echo $this->get_text_color( $options['tab_text_color'] ); ?>;" value="<?php echo esc_attr( $options['tab_text_color'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Background Color', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Background Color', 'UserEcho' ); ?></th>
 							<td>
 								<input id="tab_bg_color" name="tab_bg_color" type="text" class="regular-text" style="background-color: <?php echo $options['tab_bg_color']; ?>; color: <?php echo $this->get_text_color( $options['tab_bg_color'] ); ?>;" value="<?php echo esc_attr( $options['tab_bg_color'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Hover Color', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Hover Color', 'UserEcho' ); ?></th>
 							<td>
 								<input id="tab_hover_color" name="tab_hover_color" type="text" class="regular-text" style="background-color: <?php echo $options['tab_hover_color']; ?>; color: <?php echo $this->get_text_color( $options['tab_hover_color'] ); ?>;" value="<?php echo esc_attr( $options['tab_hover_color'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Tab alignment', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Tab alignment', 'UserEcho' ); ?></th>
 							<td>
 								<select id="tab_alignment" name="tab_alignment">
 								<?php foreach ( $tab_alignment_options as $tab_alignment_option => $tab_alignment_label ) {
@@ -196,13 +197,13 @@ class UserEcho_SSO {
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Show icon', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Show icon', 'UserEcho' ); ?></th>
 							<td>
 								<input id="tab_icon_show" name="tab_icon_show" type="checkbox" value="1"<?php checked( $options['tab_icon_show'], '1' ); ?> />
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Tab corner Radius', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Tab corner Radius', 'UserEcho' ); ?></th>
 							<td>
 								<input id="tab_corner_radius" name="tab_corner_radius" type="text" class="regular-text" value="<?php echo esc_attr( $options['tab_corner_radius'] ); ?>" />
 							</td>
@@ -213,13 +214,13 @@ class UserEcho_SSO {
 				<table class="form-table">
 					<tbody>
 						<tr valign="top">
-							<th><?php _e( 'API Key', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'API Key', 'UserEcho' ); ?></th>
 							<td>
 								<input id="api_key" name="api_key" type="text" class="regular-text" value="<?php echo esc_attr( $options['api_key'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Project Key', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Project Key', 'UserEcho' ); ?></th>
 							<td>
 								<input id="project_key" name="project_key" type="text" class="regular-text" value="<?php echo esc_attr( $options['project_key'] ); ?>" />
 							</td>
@@ -228,7 +229,7 @@ class UserEcho_SSO {
 				</table>
 
 				<p class="submit"><input type="submit" class="button-primary" value="Save Options" /></p>
-				<p class="submit"><input type="button" onclick="return confirm('<?php _e( 'Are you sure you want to reset options to default values?' ); ?>')" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=userecho_sso&ue_action=delete' ), 'ue-delete-options' ); ?>" class="button-primary" value="Reset Configuration" /></p>
+				<p class="submit"><input type="button" onclick="if(confirm('<?php _e( 'Are you sure you want to reset options to default values?' ); ?>')) location.href='<?php echo wp_nonce_url( admin_url( 'admin.php?page=userecho&ue_action=delete' ), 'ue-delete-options' ); ?>';" class="button-primary" value="Reset Configuration" /></p>
 				<div class="clear"></div>
 			</div>
 		</form>
@@ -258,7 +259,7 @@ class UserEcho_SSO {
 			);
 		}
 
-		$saved = get_option( 'UserEcho_SSO_options' );
+		$saved = get_option( 'UserEcho_options' );
 
 		$options = array();
 		if ( !empty( $saved ) ) {
@@ -268,7 +269,7 @@ class UserEcho_SSO {
 		$options += $default;
 
 		if ( $saved != $options ) {
-			update_option( 'UserEcho_SSO_options', $options );
+			update_option( 'UserEcho_options', $options );
 		}
 
 		return $options;
@@ -355,8 +356,7 @@ class UserEcho_SSO {
 
 	public function show_tab_widget()
 		{
-		global $ue_sso;
-		$options = $ue_sso->get_options();
+		$options = $this->get_options();
 		
 		if ( $options['show_tab'] ) {
 			$_ues = array(
@@ -387,7 +387,7 @@ class UserEcho_SSO {
 
 
 
-	public function sso_login() {
+	public function login() {
 		// Perform login on ?userecho_sso_login=1
 		if ( empty( $_GET['userecho_sso_login'] ) ) {
 			return;
@@ -426,8 +426,8 @@ function userecho_sso_widgets() {
 
 class UserEcho_SSO_Widget extends WP_Widget {
 	public function __construct() {
-		$widget_ops = array( 'classname' => 'userecho_sso_widget', 'description' => __( 'Adds a customizable SSO login widget to your site' ) );
-		parent::WP_Widget( 'userecho_sso_widget', __( 'UserEcho SSO Login', 'UserEchoSSO' ), $widget_ops );
+		$widget_ops = array( 'classname' => 'userecho_sso_widget', 'description' => __( 'Adds a customizable link to UserEcho community with SSO support', 'UserEcho' ) );
+		parent::WP_Widget( 'userecho_sso_widget', __( 'UserEcho link', 'UserEcho' ), $widget_ops );
 	}
 
 	public function form( $instance ) {
@@ -438,8 +438,8 @@ class UserEcho_SSO_Widget extends WP_Widget {
 			$link_text = esc_attr( $instance['link_text'] );		
 		}
 		else {
-			$title = __( 'UserEcho Login', 'UserEchoSSO' );
-			$link_text = __( 'Go to UserEcho', 'UserEchoSSO' );
+			$title = __( 'UserEcho Login', 'UserEcho' );
+			$link_text = __( 'Go to UserEcho', 'UserEcho' );
 		}
 		?>
 		<p>
@@ -479,4 +479,4 @@ class UserEcho_SSO_Widget extends WP_Widget {
 	}
 }
 
-$ue_sso = new UserEcho_SSO();
+$ue = new UserEcho();
