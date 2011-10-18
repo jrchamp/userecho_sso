@@ -32,6 +32,8 @@ class UserEcho_SSO {
 
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
 		add_action( 'template_redirect', array( $this, 'sso_login' ), 1 );
+		add_action( 'wp_footer', array( $this, 'show_tab_widget' ) );
+
 	}
 
 	public function add_menu() {
@@ -69,6 +71,8 @@ class UserEcho_SSO {
 		echo $this->meta_configuration_content();
 	}
 
+
+
 	function meta_configuration_content() {
 		$options = $this->get_options();
 		$locale_options = array(
@@ -90,33 +94,25 @@ class UserEcho_SSO {
 				<table class="form-table">
 					<tbody>
 						<tr valign="top">
-							<td width="130">
-								<label for="api_key"><?php _e( 'API Key', 'UserEchoSSO' ); ?></label>
-							</td>
+							<th><?php _e( 'API Key', 'UserEchoSSO' ); ?></th>
 							<td>
-								<input id="api_key" name="api_key" type="text" size="50" value="<?php echo esc_attr( $options['api_key'] ); ?>" />
+								<input id="api_key" name="api_key" type="text" class="regular-text" value="<?php echo esc_attr( $options['api_key'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
+							<th><?php _e( 'Project Key', 'UserEchoSSO' ); ?></th>
 							<td>
-								<label for="project_key"><?php _e( 'Project Key', 'UserEchoSSO' ); ?></label>
-							</td>
-							<td>
-								<input id="project_key" name="project_key" type="text" size="50" value="<?php echo esc_attr( $options['project_key'] ); ?>" />
+								<input id="project_key" name="project_key" type="text" class="regular-text" value="<?php echo esc_attr( $options['project_key'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
+							<th><?php _e( 'Domain', 'UserEchoSSO' ); ?></th>
 							<td>
-								<label for="domain"><?php _e( 'Domain', 'UserEchoSSO' ); ?></label>
-							</td>
-							<td>
-								<input id="domain" name="domain" type="text" size="50" value="<?php echo esc_attr( $options['domain'] ); ?>" />
+								<input id="domain" name="domain" type="text" class="regular-text" value="<?php echo esc_attr( $options['domain'] ); ?>" />
 							</td>
 						</tr>
 						<tr valign="top">
-							<td>
-								<label for="locale"><?php _e( 'Locale', 'UserEchoSSO' ); ?></label>
-							</td>
+							<th><?php _e( 'Locale', 'UserEchoSSO' ); ?></th>
 							<td>
 								<select id="locale" name="locale">
 								<?php foreach ( $locale_options as $locale => $label ) {
@@ -126,13 +122,86 @@ class UserEcho_SSO {
 							</td>
 						</tr>
 						<tr valign="top">
+							<th><?php _e( 'Show UserEcho tab widget', 'UserEchoSSO' ); ?></th>
 							<td>
-								<label for="auth_only"><?php _e( 'Only Registered Users', 'UserEchoSSO' ); ?></label>
-							</td>
-							<td>
-								<input id="auth_only" name="auth_only" type="checkbox" value="1"<?php checked( $options['auth_only'], '1' ); ?> />
+								<input id="show_tab" name="show_tab" type="checkbox" value="1"<?php checked( $options['show_tab'], '1' ); ?> />
 							</td>
 						</tr>
+
+
+
+
+
+<p>
+		<input id="<?php echo $this->get_field_id( 'show_login' ); ?>" name="<?php echo $this->get_field_name( 'show_login' ); ?>" type="checkbox" value="1"<?php checked( $show_login, 1 ); ?> />
+		<label for="<?php echo $this->get_field_id( 'show_login' ); ?>"><?php _e( 'Show Login Box', 'UserEchoSSO' ); ?></label>
+		<br />
+		<input id="<?php echo $this->get_field_id( 'show_tab' ); ?>" name="<?php echo $this->get_field_name( 'show_tab' ); ?>" type="checkbox" value="1"<?php checked( $show_tab, 1 ); ?> />
+		<label for="<?php echo $this->get_field_id( 'show_tab' ); ?>"><?php _e( 'Show Graphic Tab', 'UserEchoSSO' ); ?></label>
+		</p>
+		<p><strong><?php _e( 'Tab Options:', 'UserEchoSSO' ); ?></strong></p>
+		
+
+		<p>
+		<label for="<?php echo $this->get_field_id( 'language' ); ?>"><?php _e( 'Language:', 'UserEchoSSO' ); ?></label>
+		<select id="<?php echo $this->get_field_id( 'language' ); ?>" name="<?php echo $this->get_field_name( 'language' ); ?>">
+			<?php
+			foreach ( $language_options as $language_option => $language_label ) {
+				echo '<option value="' . esc_attr( $language_option ) . '"' .  selected( $language_option, $language, FALSE ) . '>' . esc_attr( $language_label ) . '</option>';
+			}
+			?>
+		</select>
+		</p>
+		
+
+
+		<p>
+		<label for="<?php echo $this->get_field_id( 'forum' ); ?>"><?php _e( 'Forum:', 'UserEchoSSO' ); ?></label>
+		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'forum' ); ?>" name="<?php echo $this->get_field_name( 'forum' ); ?>" type="text" value="<?php echo $forum; ?>" />
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_font_size' ); ?>"><?php _e( 'Font Size:', 'UserEchoSSO' ); ?></label>
+		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_font_size' ); ?>" name="<?php echo $this->get_field_name( 'tab_font_size' ); ?>" type="text" value="<?php echo $tab_font_size; ?>" />
+		</p>		
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_text' ); ?>"><?php _e( 'Text on tab:', 'UserEchoSSO' ); ?></label>
+		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_text' ); ?>" name="<?php echo $this->get_field_name( 'tab_text' ); ?>" type="text" value="<?php echo $tab_text; ?>" />
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_text_color' ); ?>"><?php _e( 'Text Color:', 'UserEchoSSO' ); ?></label>
+		<input style="width: 50%; background-color: <?php echo $tab_text_color; ?>; color: <?php echo $this->get_text_color( $tab_text_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_text_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_text_color' ); ?>" type="text" value="<?php echo $tab_text_color; ?>" />
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_bg_color' ); ?>"><?php _e( 'Background Color:', 'UserEchoSSO' ); ?></label>
+		<input style="width: 50%; background-color: <?php echo $tab_bg_color; ?>; color: <?php echo $this->get_text_color( $tab_bg_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_bg_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_bg_color' ); ?>" type="text" value="<?php echo $tab_bg_color; ?>" />
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_hover_color' ); ?>"><?php _e( 'Hover Color:', 'UserEchoSSO' ); ?></label>
+		<input style="width: 50%; background-color: <?php echo $tab_hover_color; ?>; color: <?php echo $this->get_text_color( $tab_hover_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_hover_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_hover_color' ); ?>" type="text" value="<?php echo $tab_hover_color; ?>" />
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_alignment' ); ?>"><?php _e( 'Alignment:', 'UserEchoSSO' ); ?></label>
+		<select id="<?php echo $this->get_field_id( 'tab_alignment' ); ?>" name="<?php echo $this->get_field_name( 'tab_alignment' ); ?>">
+			<?php
+			foreach ( $tab_alignment_options as $tab_alignment_option => $tab_alignment_label ) {
+				echo '<option value="' . esc_attr( $tab_alignment_option ) . '"' .  selected( $tab_alignment_option, $tab_alignment, FALSE ) . '>' . esc_attr( $tab_alignment_label ) . '</option>';
+			}
+			?>
+		</select>
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_icon_show' ); ?>"><?php _e( 'Show Icon:', 'UserEchoSSO' ); ?></label>
+		<input id="<?php echo $this->get_field_id( 'tab_icon_show' ); ?>" name="<?php echo $this->get_field_name( 'tab_icon_show' ); ?>" type="checkbox" value="1"<?php checked( $tab_icon_show, 1 ); ?> />
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'tab_corner_radius' ); ?>"><?php _e( 'Corner Radius:', 'UserEchoSSO' ); ?></label>
+		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_corner_radius' ); ?>" name="<?php echo $this->get_field_name( 'tab_corner_radius' ); ?>" type="text" value="<?php echo $tab_corner_radius; ?>" />
+		</p>
+
+
+
+
+
 					</tbody>
 				</table>
 				<p class="submit"><input type="submit" class="button-primary" value="Save Options" /></p>
@@ -159,6 +228,18 @@ class UserEcho_SSO {
 				'domain' => 'PROJECT_KEY.userecho.com',
 				'locale' => 'en',
 				'auth_only' => '0',
+
+				'show_tab' => 1,
+				'language' => 'en',
+				'forum' => '1',
+				'tab_corner_radius' => 10,
+				'tab_font_size' => 20,
+				'tab_alignment' => 'right',
+				'tab_text' => 'Feedback',
+				'tab_text_color' => '#ffffff',
+				'tab_bg_color' => '#ee105a',
+				'tab_hover_color' => '#f45c5c',
+				'tab_icon_show' => 1,
 			);
 		}
 
@@ -214,6 +295,45 @@ class UserEcho_SSO {
 		// encode bytes to url safe string
 		return urlencode( base64_encode( $encrypted_bytes ) );
 	}
+
+	private function get_tab_text_hash($text) {
+		//creates hash for custom text on widget
+		$revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+		return strtr(rawurlencode(base64_encode($text)), $revert);
+		}
+
+	public function show_tab_widget()
+		{
+		global $ue_sso;
+		$options = $ue_sso->get_options();
+		
+		//if ( $options['show_tab'] ) {
+			$_ues = array(
+				'host' => $options['domain'],
+				'forum' => $options['forum'],
+				'lang' => $options['language'],
+				'tab_icon_show' => (bool) $options['tab_icon_show'],
+				'tab_corner_radius' => (int) $options['tab_corner_radius'],
+				'tab_font_size' => (int) $options['tab_font_size'],
+				'tab_image_hash' => $this->get_tab_text_hash($options['tab_text']),
+				'tab_alignment' => $options['tab_alignment'],
+				'tab_text_color' => $options['tab_text_color'],
+				'tab_bg_color' => $options['tab_bg_color'],
+				'tab_hover_color' => $options['tab_hover_color'],
+			);
+			echo "<script type='text/javascript'>
+			var _ues = " . json_encode( $_ues ) . ";
+
+			(function() {
+				var _ue = document.createElement('script'); _ue.type = 'text/javascript'; _ue.async = true;
+				_ue.src = ('https:' == document.location.protocol ? 'https://s3.amazonaws.com/' : 'http://') + 'cdn.userecho.com/js/widget-1.4.gz.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(_ue, s);
+			})();
+			</script>";
+		//}
+	}
+
+
 
 	public function sso_login() {
 		// Perform login on ?userecho_sso_login=1
@@ -310,17 +430,6 @@ class UserEcho_SSO_Widget extends WP_Widget {
 			$title = __( 'UserEcho Login', 'UserEchoSSO' );
 			$link_text = __( 'Go to UserEcho', 'UserEchoSSO' );
 			$show_login = 1;
-			$show_tab = 1;
-			$language = $options['locale'];
-			$forum = '1';
-			$tab_corner_radius = 10;
-			$tab_font_size = 20;
-			$tab_alignment = 'right';
-			$tab_text = 'Feedback';
-			$tab_text_color = '#ffffff';
-			$tab_bg_color = '#ee105a';
-			$tab_hover_color = '#f45c5c';
-			$tab_icon_show = 1;
 		}
 		?>
 		<p>
@@ -331,74 +440,11 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		<label for="<?php echo $this->get_field_id( 'link_text' ); ?>"><?php _e( 'Content:' ); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id( 'link_text' ); ?>" name="<?php echo $this->get_field_name( 'link_text' ); ?>" type="text" value="<?php echo $link_text; ?>" />
 		</p>
-		<p>
-		<input id="<?php echo $this->get_field_id( 'show_login' ); ?>" name="<?php echo $this->get_field_name( 'show_login' ); ?>" type="checkbox" value="1"<?php checked( $show_login, 1 ); ?> />
-		<label for="<?php echo $this->get_field_id( 'show_login' ); ?>"><?php _e( 'Show Login Box', 'UserEchoSSO' ); ?></label>
-		<br />
-		<input id="<?php echo $this->get_field_id( 'show_tab' ); ?>" name="<?php echo $this->get_field_name( 'show_tab' ); ?>" type="checkbox" value="1"<?php checked( $show_tab, 1 ); ?> />
-		<label for="<?php echo $this->get_field_id( 'show_tab' ); ?>"><?php _e( 'Show Graphic Tab', 'UserEchoSSO' ); ?></label>
-		</p>
-		<p><strong><?php _e( 'Tab Options:', 'UserEchoSSO' ); ?></strong></p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'language' ); ?>"><?php _e( 'Language:', 'UserEchoSSO' ); ?></label>
-		<select id="<?php echo $this->get_field_id( 'language' ); ?>" name="<?php echo $this->get_field_name( 'language' ); ?>">
-			<?php
-			foreach ( $language_options as $language_option => $language_label ) {
-				echo '<option value="' . esc_attr( $language_option ) . '"' .  selected( $language_option, $language, FALSE ) . '>' . esc_attr( $language_label ) . '</option>';
-			}
-			?>
-		</select>
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'forum' ); ?>"><?php _e( 'Forum:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'forum' ); ?>" name="<?php echo $this->get_field_name( 'forum' ); ?>" type="text" value="<?php echo $forum; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_font_size' ); ?>"><?php _e( 'Font Size:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_font_size' ); ?>" name="<?php echo $this->get_field_name( 'tab_font_size' ); ?>" type="text" value="<?php echo $tab_font_size; ?>" />
-		</p>		
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_text' ); ?>"><?php _e( 'Text on tab:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_text' ); ?>" name="<?php echo $this->get_field_name( 'tab_text' ); ?>" type="text" value="<?php echo $tab_text; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_text_color' ); ?>"><?php _e( 'Text Color:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%; background-color: <?php echo $tab_text_color; ?>; color: <?php echo $this->get_text_color( $tab_text_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_text_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_text_color' ); ?>" type="text" value="<?php echo $tab_text_color; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_bg_color' ); ?>"><?php _e( 'Background Color:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%; background-color: <?php echo $tab_bg_color; ?>; color: <?php echo $this->get_text_color( $tab_bg_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_bg_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_bg_color' ); ?>" type="text" value="<?php echo $tab_bg_color; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_hover_color' ); ?>"><?php _e( 'Hover Color:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%; background-color: <?php echo $tab_hover_color; ?>; color: <?php echo $this->get_text_color( $tab_hover_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_hover_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_hover_color' ); ?>" type="text" value="<?php echo $tab_hover_color; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_alignment' ); ?>"><?php _e( 'Alignment:', 'UserEchoSSO' ); ?></label>
-		<select id="<?php echo $this->get_field_id( 'tab_alignment' ); ?>" name="<?php echo $this->get_field_name( 'tab_alignment' ); ?>">
-			<?php
-			foreach ( $tab_alignment_options as $tab_alignment_option => $tab_alignment_label ) {
-				echo '<option value="' . esc_attr( $tab_alignment_option ) . '"' .  selected( $tab_alignment_option, $tab_alignment, FALSE ) . '>' . esc_attr( $tab_alignment_label ) . '</option>';
-			}
-			?>
-		</select>
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_icon_show' ); ?>"><?php _e( 'Show Icon:', 'UserEchoSSO' ); ?></label>
-		<input id="<?php echo $this->get_field_id( 'tab_icon_show' ); ?>" name="<?php echo $this->get_field_name( 'tab_icon_show' ); ?>" type="checkbox" value="1"<?php checked( $tab_icon_show, 1 ); ?> />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_corner_radius' ); ?>"><?php _e( 'Corner Radius:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_corner_radius' ); ?>" name="<?php echo $this->get_field_name( 'tab_corner_radius' ); ?>" type="text" value="<?php echo $tab_corner_radius; ?>" />
-		</p>
+		
 		<?php
 	}
 
-	private function get_tab_text_hash($text) {
-		//creates hash for custom text on widget
-		$revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-    	return strtr(rawurlencode(base64_encode($text)), $revert);
-	}
+
 
 	private function get_text_color( $background_color ) {
 		preg_match( '/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i', $background_color, $matches );
@@ -442,39 +488,6 @@ class UserEcho_SSO_Widget extends WP_Widget {
 	}
 
 	public function widget( $args, $instance ) {
-		global $ue_sso;
-		$options = $ue_sso->get_options();
-
-		// hide widget for unauthenticated users
-		global $current_user;
-		if ( !empty( $options['auth_only'] ) && empty( $current_user->user_login ) ) {
-			return;
-		}
-
-		if ( $instance['show_tab'] ) {
-			$_ues = array(
-				'host' => $options['domain'],
-				'forum' => $instance['forum'],
-				'lang' => $instance['language'],
-				'tab_icon_show' => (bool) $instance['tab_icon_show'],
-				'tab_corner_radius' => (int) $instance['tab_corner_radius'],
-				'tab_font_size' => (int) $instance['tab_font_size'],
-				'tab_image_hash' => $this->get_tab_text_hash($instance['tab_text']),
-				'tab_alignment' => $instance['tab_alignment'],
-				'tab_text_color' => $instance['tab_text_color'],
-				'tab_bg_color' => $instance['tab_bg_color'],
-				'tab_hover_color' => $instance['tab_hover_color'],
-			);
-			echo "<script type='text/javascript'>
-			var _ues = " . json_encode( $_ues ) . ";
-
-			(function() {
-				var _ue = document.createElement('script'); _ue.type = 'text/javascript'; _ue.async = true;
-				_ue.src = ('https:' == document.location.protocol ? 'https://s3.amazonaws.com/' : 'http://') + 'cdn.userecho.com/js/widget-1.4.gz.js';
-				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(_ue, s);
-			})();
-			</script>";
-		}
 
 		if ( $instance['show_login'] ) {
 			// outputs the content of the widget
