@@ -24,7 +24,7 @@ License: GPLv2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-define( 'UE_SSO_URL', plugins_url() . '/userecho_sso' );
+define( 'UE_SSO_URL', plugins_url() . '/userecho' );
 
 class UserEcho_SSO {
 	public function __construct() {
@@ -60,7 +60,7 @@ class UserEcho_SSO {
 			if ( !empty( $_POST['api_key'] ) ) { $options['api_key'] = $_POST['api_key']; }
 			if ( !empty( $_POST['project_key'] ) ) { $options['project_key'] = $_POST['project_key']; }
 			if ( !empty( $_POST['domain'] ) ) { $options['domain'] = $_POST['domain']; }
-			if ( !empty( $_POST['locale'] ) ) { $options['locale'] = $_POST['locale']; }
+			if ( !empty( $_POST['language'] ) ) { $options['language'] = $_POST['language']; }
 			$options['auth_only'] = !empty( $_POST['auth_only'] );
 
 			if ( $orig_options !== $options ) {
@@ -222,9 +222,6 @@ class UserEcho_SSO {
 				'api_key' => '',
 				'project_key' => 'PROJECT_KEY',
 				'domain' => 'PROJECT_KEY.userecho.com',
-				'locale' => 'en',
-				'auth_only' => '0',
-
 				'show_tab' => 1,
 				'language' => 'en',
 				'forum' => '1',
@@ -383,7 +380,7 @@ class UserEcho_SSO {
 				'guid' => $current_user->user_login, // User ID in your system - used to identify user (first time auto-registration)
 				'display_name' => $current_user->display_name, // User display name in your system
 				'email' => $current_user->user_email, // User email - used for notification about changes on feedback
-				'locale' => $options['locale'], // (Optional) User language override
+				'locale' => $options['language'], // (Optional) User language override
 			);
 
 			$redirect .= '?sso_token=' . $this->get_sso_token( $params );
