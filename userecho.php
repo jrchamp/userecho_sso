@@ -66,55 +66,7 @@ class UserEcho_SSO {
 			}
 		}
 
-		$screen_layout_columns = 2;
-		$screen = get_current_screen();
-
-		add_meta_box( 'userecho_sso_configuration', __( 'Configuration', 'UserEchoSSO' ), array( $this, 'meta_configuration_content' ), $screen->id, 'normal', 'core' );
-		add_meta_box( 'userecho_sso_reset_configuration', __( 'Reset Configuration', 'UserEchoSSO' ), array( $this, 'meta_reset_configuration_content' ), $screen->id, 'side', 'core' );
-
-		$title = 'UserEcho SSO: ' . __( 'Options' );
-?>
-		<div class="wrap">
-			<?php screen_icon( 'options-general' ); ?>
-			<h2><?php echo esc_html( $title ); ?></h2>
-			<div id="dashboard-widgets-wrap">
-<?php
-		$column_visibility = array(
-			'normal' => '',
-			'side' => '',
-			'column3' => '',
-			'column4' => '',
-		);
-		switch ( $screen_layout_columns ) {
-			case 4:
-				$width = 'width:24.5%;';
-				break;
-			case 3:
-				$width = 'width:32.67%;';
-				$column_visibility['column4'] = 'display:none;';
-				break;
-			case 2:
-				$width = 'width:49%;';
-				$column_visibility['column3'] = $column_visibility['column4'] = 'display:none;';
-				break;
-			default:
-				$width = 'width:98%;';
-				$column_visibility['side'] = $column_visibility['column3'] = $column_visibility['column4'] = 'display:none;';
-		}
-?>
-				<div id="dashboard-widgets" class="metabox-holder">
-<?php
-		foreach ( $column_visibility as $column => $visibility ) {
-			echo "\t\t\t\t<div class='postbox-container' style='{$visibility}$width'>\n";
-			do_meta_boxes( $screen->id, $column, '' );
-			echo "\t\t\t\t</div>\n";
-		}
-?>
-				</div>
-				<div class="clear"></div>
-			</div><!-- dashboard-widgets-wrap -->
-		</div><!-- wrap -->
-<?php
+		echo $this->meta_configuration_content();
 	}
 
 	function meta_configuration_content() {
