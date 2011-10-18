@@ -1,10 +1,10 @@
 === UserEcho ===
 Contributors: sstukov
 Donate link: http://userecho.com/
-Tags: comments, spam
+Tags: feedback, users community, widget, ideas
 Requires at least: 2.0.2
-Tested up to: 2.1
-Stable tag: 4.3
+Tested up to: 3.2.1
+Stable tag: 1.0
 
 Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
 
@@ -64,19 +64,7 @@ the directory of the stable readme.txt, so in this case, `/tags/4.3/screenshot-1
 == Changelog ==
 
 = 1.0 =
-* A change since the previous version.
-* Another change.
-
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
-
-== Upgrade Notice ==
-
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
-
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
+* Initial release
 
 == Arbitrary section ==
 
