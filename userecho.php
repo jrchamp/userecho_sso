@@ -75,14 +75,26 @@ class UserEcho_SSO {
 
 	function meta_configuration_content() {
 		$options = $this->get_options();
-		$locale_options = array(
-			'nl' => __( 'Dutch' ),
-			'en' => __( 'English' ),
-			'de' => __( 'German' ),
-			'ru' => __( 'Russian' ),
+		
+		$language_options = array(
+			'en' => __( 'English' ) . ' (EN)',
+			'ru' => __( 'Russian' ) . ' (RU)',
+			'es' => __( 'Spanish' ) . ' (ES)',
+			'fr' => __( 'French' ) . ' (FR)',
+			'de' => __( 'German' ) . ' (DE)',
+			'nl' => __( 'Dutch' ) . ' (NL)',
+			'is' => __( 'Icelandic' ) . ' (IS)',
+			'et' => __( 'Estonian' ) . ' (ET)',
 		);
-		if ( !empty( $options['locale'] ) ) {
-			$locale_options += array( $options['locale'] => 'Custom (' + $options['locale'] + ')' );
+
+		$tab_alignment_options = array(
+			'left' => __( 'Left' ),
+			'right' => __( 'Right' ),
+		);
+		
+
+		if ( !empty( $options['language'] ) ) {
+			$language_options += array( $options['language'] => 'Custom (' + $options['language'] + ')' );
 		}
 
 ?>
@@ -112,11 +124,11 @@ class UserEcho_SSO {
 							</td>
 						</tr>
 						<tr valign="top">
-							<th><?php _e( 'Locale', 'UserEchoSSO' ); ?></th>
+							<th><?php _e( 'Language', 'UserEchoSSO' ); ?></th>
 							<td>
-								<select id="locale" name="locale">
-								<?php foreach ( $locale_options as $locale => $label ) {
-									echo '<option value="' . esc_attr( $locale ) . '"' . selected( $locale, $options['locale'], false ) . '>' . esc_attr( $label ) . '</option>';
+								<select id="language" name="language">
+								<?php foreach ( $language_options as $locale => $label ) {
+									echo '<option value="' . esc_attr( $locale ) . '"' . selected( $locale, $options['language'], false ) . '>' . esc_attr( $label ) . '</option>';
 								} ?>
 								</select>
 							</td>
@@ -127,80 +139,64 @@ class UserEcho_SSO {
 								<input id="show_tab" name="show_tab" type="checkbox" value="1"<?php checked( $options['show_tab'], '1' ); ?> />
 							</td>
 						</tr>
-
-
-
-
-
-<p>
-		<input id="<?php echo $this->get_field_id( 'show_login' ); ?>" name="<?php echo $this->get_field_name( 'show_login' ); ?>" type="checkbox" value="1"<?php checked( $show_login, 1 ); ?> />
-		<label for="<?php echo $this->get_field_id( 'show_login' ); ?>"><?php _e( 'Show Login Box', 'UserEchoSSO' ); ?></label>
-		<br />
-		<input id="<?php echo $this->get_field_id( 'show_tab' ); ?>" name="<?php echo $this->get_field_name( 'show_tab' ); ?>" type="checkbox" value="1"<?php checked( $show_tab, 1 ); ?> />
-		<label for="<?php echo $this->get_field_id( 'show_tab' ); ?>"><?php _e( 'Show Graphic Tab', 'UserEchoSSO' ); ?></label>
-		</p>
-		<p><strong><?php _e( 'Tab Options:', 'UserEchoSSO' ); ?></strong></p>
-		
-
-		<p>
-		<label for="<?php echo $this->get_field_id( 'language' ); ?>"><?php _e( 'Language:', 'UserEchoSSO' ); ?></label>
-		<select id="<?php echo $this->get_field_id( 'language' ); ?>" name="<?php echo $this->get_field_name( 'language' ); ?>">
-			<?php
-			foreach ( $language_options as $language_option => $language_label ) {
-				echo '<option value="' . esc_attr( $language_option ) . '"' .  selected( $language_option, $language, FALSE ) . '>' . esc_attr( $language_label ) . '</option>';
-			}
-			?>
-		</select>
-		</p>
-		
-
-
-		<p>
-		<label for="<?php echo $this->get_field_id( 'forum' ); ?>"><?php _e( 'Forum:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'forum' ); ?>" name="<?php echo $this->get_field_name( 'forum' ); ?>" type="text" value="<?php echo $forum; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_font_size' ); ?>"><?php _e( 'Font Size:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_font_size' ); ?>" name="<?php echo $this->get_field_name( 'tab_font_size' ); ?>" type="text" value="<?php echo $tab_font_size; ?>" />
-		</p>		
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_text' ); ?>"><?php _e( 'Text on tab:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_text' ); ?>" name="<?php echo $this->get_field_name( 'tab_text' ); ?>" type="text" value="<?php echo $tab_text; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_text_color' ); ?>"><?php _e( 'Text Color:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%; background-color: <?php echo $tab_text_color; ?>; color: <?php echo $this->get_text_color( $tab_text_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_text_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_text_color' ); ?>" type="text" value="<?php echo $tab_text_color; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_bg_color' ); ?>"><?php _e( 'Background Color:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%; background-color: <?php echo $tab_bg_color; ?>; color: <?php echo $this->get_text_color( $tab_bg_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_bg_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_bg_color' ); ?>" type="text" value="<?php echo $tab_bg_color; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_hover_color' ); ?>"><?php _e( 'Hover Color:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%; background-color: <?php echo $tab_hover_color; ?>; color: <?php echo $this->get_text_color( $tab_hover_color ); ?>;" id="<?php echo $this->get_field_id( 'tab_hover_color' ); ?>" name="<?php echo $this->get_field_name( 'tab_hover_color' ); ?>" type="text" value="<?php echo $tab_hover_color; ?>" />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_alignment' ); ?>"><?php _e( 'Alignment:', 'UserEchoSSO' ); ?></label>
-		<select id="<?php echo $this->get_field_id( 'tab_alignment' ); ?>" name="<?php echo $this->get_field_name( 'tab_alignment' ); ?>">
-			<?php
-			foreach ( $tab_alignment_options as $tab_alignment_option => $tab_alignment_label ) {
-				echo '<option value="' . esc_attr( $tab_alignment_option ) . '"' .  selected( $tab_alignment_option, $tab_alignment, FALSE ) . '>' . esc_attr( $tab_alignment_label ) . '</option>';
-			}
-			?>
-		</select>
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_icon_show' ); ?>"><?php _e( 'Show Icon:', 'UserEchoSSO' ); ?></label>
-		<input id="<?php echo $this->get_field_id( 'tab_icon_show' ); ?>" name="<?php echo $this->get_field_name( 'tab_icon_show' ); ?>" type="checkbox" value="1"<?php checked( $tab_icon_show, 1 ); ?> />
-		</p>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'tab_corner_radius' ); ?>"><?php _e( 'Corner Radius:', 'UserEchoSSO' ); ?></label>
-		<input style="width: 50%;" id="<?php echo $this->get_field_id( 'tab_corner_radius' ); ?>" name="<?php echo $this->get_field_name( 'tab_corner_radius' ); ?>" type="text" value="<?php echo $tab_corner_radius; ?>" />
-		</p>
-
-
-
-
+						<tr valign="top">
+							<th><?php _e( 'Forum id', 'UserEchoSSO' ); ?></th>
+							<td>
+								<input id="forum" name="forum" type="text" class="regular-text" value="<?php echo esc_attr( $options['forum'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<th><?php _e( 'Font size', 'UserEchoSSO' ); ?></th>
+							<td>
+								<input id="tab_font_size" name="tab_font_size" type="text" class="regular-text" value="<?php echo esc_attr( $options['tab_font_size'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<th><?php _e( 'Text on tab', 'UserEchoSSO' ); ?></th>
+							<td>
+								<input id="tab_text" name="tab_text" type="text" class="regular-text" value="<?php echo esc_attr( $options['tab_text'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<th><?php _e( 'Text color', 'UserEchoSSO' ); ?></th>
+							<td>
+								<input id="tab_text_color" name="tab_text_color" type="text" class="regular-text" style="background-color: <?php echo $options['tab_text_color']; ?>; color: <?php echo $this->get_text_color( $options['tab_text_color'] ); ?>;" value="<?php echo esc_attr( $options['tab_text_color'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<th><?php _e( 'Background Color', 'UserEchoSSO' ); ?></th>
+							<td>
+								<input id="tab_bg_color" name="tab_bg_color" type="text" class="regular-text" style="background-color: <?php echo $options['tab_bg_color']; ?>; color: <?php echo $this->get_text_color( $options['tab_bg_color'] ); ?>;" value="<?php echo esc_attr( $options['tab_bg_color'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<th><?php _e( 'Hover Color', 'UserEchoSSO' ); ?></th>
+							<td>
+								<input id="tab_hover_color" name="tab_hover_color" type="text" class="regular-text" style="background-color: <?php echo $options['tab_hover_color']; ?>; color: <?php echo $this->get_text_color( $options['tab_hover_color'] ); ?>;" value="<?php echo esc_attr( $options['tab_hover_color'] ); ?>" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<th><?php _e( 'Tab alignment', 'UserEchoSSO' ); ?></th>
+							<td>
+								<select id="tab_alignment" name="tab_alignment">
+								<?php foreach ( $tab_alignment_options as $tab_alignment_option => $tab_alignment_label ) {
+									echo '<option value="' . esc_attr( $tab_alignment_option ) . '"' .  selected( $tab_alignment_option, $options['tab_alignment'], FALSE ) . '>' . esc_attr( $tab_alignment_label ) . '</option>';
+								}?>
+								</select>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th><?php _e( 'Show icon', 'UserEchoSSO' ); ?></th>
+							<td>
+								<input id="tab_icon_show" name="tab_icon_show" type="checkbox" value="1"<?php checked( $options['tab_icon_show'], '1' ); ?> />
+							</td>
+						</tr>
+						<tr valign="top">
+							<th><?php _e( 'Tab corner Radius', 'UserEchoSSO' ); ?></th>
+							<td>
+								<input id="tab_corner_radius" name="tab_corner_radius" type="text" class="regular-text" value="<?php echo esc_attr( $options['tab_corner_radius'] ); ?>" />
+							</td>
+						</tr>
 
 					</tbody>
 				</table>
@@ -302,6 +298,27 @@ class UserEcho_SSO {
 		return strtr(rawurlencode(base64_encode($text)), $revert);
 		}
 
+	private function get_text_color( $background_color ) {
+		preg_match( '/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i', $background_color, $matches );
+		if ( !empty( $matches[1] ) ) {
+			$luminosity = 0;
+			$color_length = strlen( $matches[1] ) / 3;
+			$colors = str_split( $matches[1], $color_length );
+			$coefficients = array( .2126, .7152, .0722 );
+			foreach ( $colors as $index => $color ) {
+				if ( $color_length === 1 ) {
+					$color .= $color;
+				}
+				$color_percent = hexdec( $color ) / 255;
+				$luminosity += $color_percent * $coefficients[$index];
+			}
+		}
+		else {
+			$luminosity = 1;
+		}
+		return ( $luminosity > 0.5 ? '#000' : '#fff' );
+	}
+
 	public function show_tab_widget()
 		{
 		global $ue_sso;
@@ -392,23 +409,7 @@ class UserEcho_SSO_Widget extends WP_Widget {
 	public function form( $instance ) {
 		global $ue_sso;
 		$options = $ue_sso->get_options();
-
-		$language_options = array(
-			'en' => __( 'English' ) . ' (EN)',
-			'ru' => __( 'Russian' ) . ' (RU)',
-			'es' => __( 'Spanish' ) . ' (ES)',
-			'fr' => __( 'French' ) . ' (FR)',
-			'de' => __( 'German' ) . ' (DE)',
-			'nl' => __( 'Dutch' ) . ' (NL)',
-			'is' => __( 'Icelandic' ) . ' (IS)',
-			'et' => __( 'Estonian' ) . ' (ET)',
-		);
-
-		$tab_alignment_options = array(
-			'left' => __( 'Left' ),
-			'right' => __( 'Right' ),
-		);
-
+	
 		// outputs the options form on admin
 		if ( $instance ) {
 			$title = esc_attr( $instance['title'] );
@@ -442,29 +443,6 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		</p>
 		
 		<?php
-	}
-
-
-
-	private function get_text_color( $background_color ) {
-		preg_match( '/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i', $background_color, $matches );
-		if ( !empty( $matches[1] ) ) {
-			$luminosity = 0;
-			$color_length = strlen( $matches[1] ) / 3;
-			$colors = str_split( $matches[1], $color_length );
-			$coefficients = array( .2126, .7152, .0722 );
-			foreach ( $colors as $index => $color ) {
-				if ( $color_length === 1 ) {
-					$color .= $color;
-				}
-				$color_percent = hexdec( $color ) / 255;
-				$luminosity += $color_percent * $coefficients[$index];
-			}
-		}
-		else {
-			$luminosity = 1;
-		}
-		return ( $luminosity > 0.5 ? '#000' : '#fff' );
 	}
 
 	public function update( $new_instance, $old_instance ) {
