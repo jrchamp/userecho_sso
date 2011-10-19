@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: UserEcho - collect feedback for your blog
-Version: 1.0
-Plugin URI: http://userecho.com
+Version: 1.0.2
+Plugin URI: http://wordpress.org/extend/plugins/userecho/
 Author: Jonathan Champ, Sergey Stukov
 Author URI: http://userecho.com
 Description: Add UserEcho - feedback widget to collect and manage feedback for your blog.
@@ -33,7 +33,6 @@ class UserEcho {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
 		add_action( 'template_redirect', array( $this, 'login' ), 1 );
 		add_action( 'wp_footer', array( $this, 'show_tab_widget' ) );
-
 	}
 
 	public function add_menu() {
@@ -61,17 +60,16 @@ class UserEcho {
 			if ( !empty( $_POST['project_key'] ) ) { $options['project_key'] = $_POST['project_key']; }
 			if ( !empty( $_POST['domain'] ) ) { $options['domain'] = $_POST['domain']; }
 			if ( !empty( $_POST['language'] ) ) { $options['language'] = $_POST['language']; }
-			$options['auth_only'] = !empty( $_POST['auth_only'] );
 			$options['show_tab'] = !empty( $_POST['show_tab'] );
 			$options['tab_icon_show'] = !empty( $_POST['tab_icon_show'] );
 			if ( !empty( $_POST['forum'] ) ) { $options['forum'] = $_POST['forum']; }
-			if ( !empty( $_POST['tab_corner_radius'] ) ) { $options['tab_corner_radius'] = $_POST['tab_corner_radius']; }			
-			if ( !empty( $_POST['tab_font_size'] ) ) { $options['tab_font_size'] = $_POST['tab_font_size']; }			
-			if ( !empty( $_POST['tab_alignment'] ) ) { $options['tab_alignment'] = $_POST['tab_alignment']; }			
-			if ( !empty( $_POST['tab_text'] ) ) { $options['tab_text'] = $_POST['tab_text']; }			
-			if ( !empty( $_POST['tab_text_color'] ) ) { $options['tab_text_color'] = $_POST['tab_text_color']; }			
-			if ( !empty( $_POST['tab_bg_color'] ) ) { $options['tab_bg_color'] = $_POST['tab_bg_color']; }			
-			if ( !empty( $_POST['tab_hover_color'] ) ) { $options['tab_hover_color'] = $_POST['tab_hover_color']; }			
+			if ( !empty( $_POST['tab_corner_radius'] ) ) { $options['tab_corner_radius'] = $_POST['tab_corner_radius']; }
+			if ( !empty( $_POST['tab_font_size'] ) ) { $options['tab_font_size'] = $_POST['tab_font_size']; }
+			if ( !empty( $_POST['tab_alignment'] ) ) { $options['tab_alignment'] = $_POST['tab_alignment']; }
+			if ( !empty( $_POST['tab_text'] ) ) { $options['tab_text'] = $_POST['tab_text']; }
+			if ( !empty( $_POST['tab_text_color'] ) ) { $options['tab_text_color'] = $_POST['tab_text_color']; }
+			if ( !empty( $_POST['tab_bg_color'] ) ) { $options['tab_bg_color'] = $_POST['tab_bg_color']; }
+			if ( !empty( $_POST['tab_hover_color'] ) ) { $options['tab_hover_color'] = $_POST['tab_hover_color']; }
 
 			if ( $orig_options !== $options ) {
 				update_option( 'UserEcho_options', $options );
@@ -81,10 +79,9 @@ class UserEcho {
 		echo $this->meta_configuration_content();
 	}
 
-
 	function meta_configuration_content() {
 		$options = $this->get_options();
-		
+
 		$language_options = array(
 			'en' => __( 'English' ) . ' (EN)',
 			'ru' => __( 'Russian' ) . ' (RU)',
@@ -100,7 +97,6 @@ class UserEcho {
 			'left' => __( 'Left' ),
 			'right' => __( 'Right' ),
 		);
-		
 
 		if ( !empty( $options['language'] ) ) {
 			$language_options += array( $options['language'] => 'Custom (' + $options['language'] + ')' );
@@ -108,7 +104,7 @@ class UserEcho {
 
 ?>
 <div class="wrap">
-<div id="icon-options-general" class="icon32"><br></div>
+<div id="icon-options-general" class="icon32"><br /></div>
 <h2>UserEcho integration Settings</h2>
 <h3>Tab widget:</h3>
 
@@ -148,14 +144,12 @@ class UserEcho {
 								</select>
 							</td>
 						</tr>
+					</tbody>
+				</table>
 
-						</tbody>
-
-						</table>
-						<h3>Tab visual style:</h3>
-						<table class="form-table"><tbody>
-						
-						
+				<h3>Tab visual style:</h3>
+				<table class="form-table">
+					<tbody>
 						<tr valign="top">
 							<th><?php _e( 'Font size', 'UserEcho' ); ?></th>
 							<td>
@@ -191,7 +185,7 @@ class UserEcho {
 							<td>
 								<select id="tab_alignment" name="tab_alignment">
 								<?php foreach ( $tab_alignment_options as $tab_alignment_option => $tab_alignment_label ) {
-									echo '<option value="' . esc_attr( $tab_alignment_option ) . '"' .  selected( $tab_alignment_option, $options['tab_alignment'], FALSE ) . '>' . esc_attr( $tab_alignment_label ) . '</option>';
+									echo '<option value="' . esc_attr( $tab_alignment_option ) . '"' . selected( $tab_alignment_option, $options['tab_alignment'], FALSE ) . '>' . esc_attr( $tab_alignment_label ) . '</option>';
 								}?>
 								</select>
 							</td>
@@ -210,7 +204,8 @@ class UserEcho {
 						</tr>
 					</tbody>
 				</table>
-<h3>Single Sign On (SSO):</h3>
+
+				<h3>Single Sign On (SSO):</h3>
 				<table class="form-table">
 					<tbody>
 						<tr valign="top">
@@ -279,19 +274,17 @@ class UserEcho {
 		global $current_user;
 		$options = $this->get_options();
 
-		if ( !empty( $current_user->user_login ) ) {
-			$params = array(
-				'guid' => $current_user->user_login, // User ID in your system - used to identify user (first time auto-registration)
-				'display_name' => $current_user->display_name, // User display name in your system
-				'email' => $current_user->user_email, // User email - used for notification about changes on feedback
-				'locale' => $options['language'], // (Optional) User language override
-			);
+		if ( empty( $current_user->user_login ) ) {
+			return "";
 		}
-		else
-		return "";
 
+		$params = array(
+			'guid' => $current_user->user_login, // User ID in your system - used to identify user (first time auto-registration)
+			'display_name' => $current_user->display_name, // User display name in your system
+			'email' => $current_user->user_email, // User email - used for notification about changes on feedback
+			'locale' => $options['language'], // (Optional) User language override
+		);
 
-		
 		$api_key = $options['api_key']; // Your project personal api key
 		$project_key = $options['project_key']; // Your project alias
 
@@ -327,11 +320,17 @@ class UserEcho {
 		return urlencode( base64_encode( $encrypted_bytes ) );
 	}
 
-	private function get_tab_text_hash($text) {
-		//creates hash for custom text on widget
-		$revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-		return strtr(rawurlencode(base64_encode($text)), $revert);
-		}
+	private function get_tab_text_hash( $text ) {
+		// creates hash for custom text on widget
+		$revert = array(
+			'%21' => '!',
+			'%2A' => '*',
+			'%27' => "'",
+			'%28' => '(',
+			'%29' => ')',
+		);
+		return strtr( rawurlencode( base64_encode( $text ) ), $revert );
+	}
 
 	private function get_text_color( $background_color ) {
 		preg_match( '/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i', $background_color, $matches );
@@ -354,10 +353,9 @@ class UserEcho {
 		return ( $luminosity > 0.5 ? '#000' : '#fff' );
 	}
 
-	public function show_tab_widget()
-		{
+	public function show_tab_widget() {
 		$options = $this->get_options();
-		
+
 		if ( $options['show_tab'] ) {
 			$_ues = array(
 				'host' => $options['domain'],
@@ -366,12 +364,12 @@ class UserEcho {
 				'tab_icon_show' => (bool) $options['tab_icon_show'],
 				'tab_corner_radius' => (int) $options['tab_corner_radius'],
 				'tab_font_size' => (int) $options['tab_font_size'],
-				'tab_image_hash' => $this->get_tab_text_hash($options['tab_text']),
+				'tab_image_hash' => $this->get_tab_text_hash( $options['tab_text'] ),
 				'tab_alignment' => $options['tab_alignment'],
 				'tab_text_color' => $options['tab_text_color'],
 				'tab_bg_color' => $options['tab_bg_color'],
 				'tab_hover_color' => $options['tab_hover_color'],
-				'params' => array('sso_token' => $this->get_sso_token()),
+				'params' => array( 'sso_token' => $this->get_sso_token() ),
 			);
 			echo "<script type='text/javascript'>
 			var _ues = " . json_encode( $_ues ) . ";
@@ -385,8 +383,6 @@ class UserEcho {
 		}
 	}
 
-
-
 	public function login() {
 		// Perform login on ?userecho_sso_login=1
 		if ( empty( $_GET['userecho_sso_login'] ) ) {
@@ -395,24 +391,17 @@ class UserEcho {
 
 		$options = $this->get_options();
 
-		$base_url = 'http://' . $options['domain'] . '/';
+		$redirect = 'http://' . $options['domain'] . '/';
 
-		if ( empty( $options['api_key'] ) ) {
-			//if api_key not provided just go to the userecho forum without authorization, like simple link was clciked
-			header( 'Location: ' . $base_url );
-			die();
-			return;
+		if ( isset( $_GET['return'] ) && strpos( $_GET['return'], $redirect ) === 0 ) {
+			$redirect = $_GET['return'];
 		}
 
-		
-		if ( isset( $_GET['return'] ) && strpos( $_GET['return'], $base_url ) === 0 ) {
-			$base_url = $_GET['return'];
+		// if api_key not provided just go to the userecho forum without authorization, like simple link was clciked
+		if ( !empty( $options['api_key'] ) ) {
+			$redirect .= '?sso_token=' . $this->get_sso_token();
 		}
 
-		$redirect = $base_url;
-
-		$redirect .= '?sso_token=' . $this->get_sso_token();
-		
 		header( 'Location: ' . $redirect );
 		die();
 	}
@@ -427,15 +416,14 @@ function userecho_sso_widgets() {
 class UserEcho_SSO_Widget extends WP_Widget {
 	public function __construct() {
 		$widget_ops = array( 'classname' => 'userecho_sso_widget', 'description' => __( 'Adds a customizable link to UserEcho community with SSO support', 'UserEcho' ) );
-		parent::WP_Widget( 'userecho_sso_widget', __( 'UserEcho link', 'UserEcho' ), $widget_ops );
+		parent::__construct( 'userecho_sso_widget', __( 'UserEcho link', 'UserEcho' ), $widget_ops );
 	}
 
 	public function form( $instance ) {
-	
 		// outputs the options form on admin
 		if ( $instance ) {
 			$title = esc_attr( $instance['title'] );
-			$link_text = esc_attr( $instance['link_text'] );		
+			$link_text = esc_attr( $instance['link_text'] );
 		}
 		else {
 			$title = __( 'UserEcho Login', 'UserEcho' );
@@ -450,7 +438,6 @@ class UserEcho_SSO_Widget extends WP_Widget {
 		<label for="<?php echo $this->get_field_id( 'link_text' ); ?>"><?php _e( 'Content:' ); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id( 'link_text' ); ?>" name="<?php echo $this->get_field_name( 'link_text' ); ?>" type="text" value="<?php echo $link_text; ?>" />
 		</p>
-		
 		<?php
 	}
 
@@ -463,19 +450,17 @@ class UserEcho_SSO_Widget extends WP_Widget {
 	}
 
 	public function widget( $args, $instance ) {
-
-			// outputs the content of the widget
-			extract( $args );
-			$title = apply_filters( 'widget_title', $instance['title'] );
-			echo $before_widget;
-			if ( $title ) {
-				echo $before_title . $title . $after_title;
-			}
-			?>
-			<a href="?userecho_sso_login=1"><?php echo $instance['link_text']; ?></a>
-			<?php
-			echo $after_widget;
-		
+		// outputs the content of the widget
+		extract( $args );
+		$title = apply_filters( 'widget_title', $instance['title'] );
+		echo $before_widget;
+		if ( $title ) {
+			echo $before_title . $title . $after_title;
+		}
+		?>
+		<a href="?userecho_sso_login=1"><?php echo $instance['link_text']; ?></a>
+		<?php
+		echo $after_widget;
 	}
 }
 
